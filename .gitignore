@@ -1,1 +1,23 @@
-src/.env
+# Python bytecode
+*.pyc
+__pycache__/
+
+# Virtual environment
+venv/
+.venv/
+
+# Visual Studio Code files
+.vscode/
+*.code-workspace
+
+# macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# PyCharm files
+.idea/
+
+# Other
+*.swp
+.env
