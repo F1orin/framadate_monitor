@@ -2,7 +2,7 @@ import argparse
 import logging
 from dotenv import load_dotenv
 
-from scraper import check_user_has_unmarked_days
+from scraper import check_player_has_unmarked_days
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
     load_dotenv()
     log.debug('Environment variables loaded')
 
-    has_unmarked_days = check_user_has_unmarked_days()
+    has_unmarked_days = check_player_has_unmarked_days()
     log.info(f'has_unmarked_days: {has_unmarked_days}')
 
 
