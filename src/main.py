@@ -1,8 +1,10 @@
 import argparse
 import logging
+import sys
+
 from dotenv import load_dotenv
 
-from scraper import check_player_has_unmarked_days
+from scraper import check_player_has_unmarked_days, PlayerNotFoundError
 
 
 def main():
@@ -28,7 +30,15 @@ def main():
     load_dotenv()
     log.debug('Environment variables loaded')
 
-    has_unmarked_days = check_player_has_unmarked_days()
+    try:
+        has_unmarked_days = check_player_has_unmarked_days()
+    except ValueError as e:
+        # Missing required configuration (.env variables)
+        log.error(str(e))
+        sys.exit(1)
+    except PlayerNotFoundError as e:
+        log.error(str(e))
+        sys.exit(2)
     log.info(f'has_unmarked_days: {has_unmarked_days}')
 
 

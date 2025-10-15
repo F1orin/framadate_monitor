@@ -13,23 +13,36 @@ log = logging.getLogger(__name__)
 
 
 class Vote(StrEnum):
+    """Represents possible responses/votes to a Framadate poll."""
     YES = "Yes"
     NO = "No"
     UNDER_RESERVE = "Under reserve"
     I_DONT_KNOW = "I don’t know"  # curly apostrophe on purpose
 
 
-class VoteStatus(IntEnum):
-    HAS_UNMARKED = 1
-    ALL_MARKED = 0
-    PLAYER_NOT_FOUND = -1
+class PlayerNotFoundError(LookupError):
+    """Raised when the player's response row is not found in the Framadate table."""
 
 
-def check_player_has_unmarked_days():
-    log.debug('user_has_unmarked_days called')
+def check_player_has_unmarked_days() -> bool:
+    """
+    Checks the Framadate poll to determine if a player has any unmarked (i.e., "I don't know") days.
+
+    Returns:
+        VoteStatus: See `VoteStatus` class documentation for descriptions of the returned values.
+
+    Reads environment variables:
+        FRAMADATE_URL: URL of the Framadate poll.
+        PLAYER_NAME: Name of the player to search for.
+
+    Uses Selenium WebDriver to interact with the Framadate web interface and analyze poll results.
+    """
+    log.debug('check_player_has_unmarked_days called')
 
     framadate_url = os.environ["FRAMADATE_URL"]
     player_name = os.environ["PLAYER_NAME"]
+    if not framadate_url or not player_name:
+        raise ValueError("FRAMADATE_URL and PLAYER_NAME must be set in .env")
 
     opts = Options()
     opts.add_argument("--headless=new")
@@ -55,7 +68,8 @@ def check_player_has_unmarked_days():
                 break
 
         if not target_row:
-            return VoteStatus.PLAYER_NOT_FOUND
+            raise PlayerNotFoundError(
+                f"Player '{player_name}' not found")
 
         cells = target_row.find_elements(By.CSS_SELECTOR, "td")
         for c in cells:
@@ -64,6 +78,6 @@ def check_player_has_unmarked_days():
             log.debug(f"Answer found: {value}")
 
             if value == Vote.I_DONT_KNOW:
-                return VoteStatus.HAS_UNMARKED
+                return True
 
-    return VoteStatus.ALL_MARKED
+    return False
