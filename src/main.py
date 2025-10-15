@@ -1,10 +1,19 @@
 import argparse
 import logging
+import os
 import sys
 
 from dotenv import load_dotenv
 
+from notifier import send_email
 from scraper import check_player_has_unmarked_days, PlayerNotFoundError
+
+
+def _validate_env(required_vars: list[str]):
+    missing = [v for v in required_vars if not os.getenv(v)]
+    if missing:
+        raise KeyError(
+            f"Missing required environment variables: {', '.join(missing)}")
 
 
 def main():
@@ -28,18 +37,37 @@ def main():
 
     log.debug('Loading environment variables')
     load_dotenv()
-    log.debug('Environment variables loaded')
-
     try:
-        has_unmarked_days = check_player_has_unmarked_days()
-    except ValueError as e:
-        # Missing required configuration (.env variables)
+        _validate_env([
+            "FRAMADATE_URL",
+            "PLAYER_NAME",
+            "MAILGUN_API_KEY",
+            "MAILGUN_DOMAIN",
+            "MAILGUN_BASE_URL"
+        ])
+    except KeyError as e:
         log.error(str(e))
         sys.exit(1)
+    log.info('Environment variables validated')
+
+    try:
+        framadate_url = os.environ["FRAMADATE_URL"]
+        player_name = os.environ["PLAYER_NAME"]
+
+        has_unmarked_days = check_player_has_unmarked_days(
+            framadate_url, player_name)
+
+        if has_unmarked_days:
+            send_email(
+                subject="[Framadate monitor] New matches available",
+                body=f"{player_name} has unanswered matches in the Framadate: {framadate_url}"
+            )
+            log.info("Email about unmarked days sent")
+        else:
+            log.info(f"All days are marked for '{player_name}'")
     except PlayerNotFoundError as e:
         log.error(str(e))
         sys.exit(2)
-    log.info(f'has_unmarked_days: {has_unmarked_days}')
 
 
 if __name__ == "__main__":

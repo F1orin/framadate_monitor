@@ -1,7 +1,5 @@
 import logging
-import os
 
-from enum import IntEnum
 from enum import StrEnum
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -24,7 +22,7 @@ class PlayerNotFoundError(LookupError):
     """Raised when the player's response row is not found in the Framadate table."""
 
 
-def check_player_has_unmarked_days() -> bool:
+def check_player_has_unmarked_days(framadate_url, player_name) -> bool:
     """
     Checks the Framadate poll to determine if a player has any unmarked (i.e., "I don't know") days.
 
@@ -38,11 +36,6 @@ def check_player_has_unmarked_days() -> bool:
     Uses Selenium WebDriver to interact with the Framadate web interface and analyze poll results.
     """
     log.debug('check_player_has_unmarked_days called')
-
-    framadate_url = os.environ["FRAMADATE_URL"]
-    player_name = os.environ["PLAYER_NAME"]
-    if not framadate_url or not player_name:
-        raise ValueError("FRAMADATE_URL and PLAYER_NAME must be set in .env")
 
     opts = Options()
     opts.add_argument("--headless=new")
