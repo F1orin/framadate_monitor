@@ -62,9 +62,10 @@ def main():
                 subject="[Framadate monitor] New matches available",
                 body=f"{player_name} has unanswered matches in the Framadate: {framadate_url}"
             )
-            log.info("Email about unmarked days sent")
+            log.info(f"Found unmartked days for '{player_name}', email sent")
         else:
-            log.info(f"All days are marked for '{player_name}'")
+            log.info(
+                f"All days are marked for '{player_name}', email not sent")
     except PlayerNotFoundError as e:
         log.error(str(e))
         sys.exit(2)
