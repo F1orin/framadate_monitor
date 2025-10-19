@@ -1,6 +1,8 @@
 name: check-and-alert
 
 on:
+  schedule:
+    - cron: "0 9 * * *" # every day at 9AM
   workflow_dispatch:
 
 jobs:
@@ -24,9 +26,9 @@ jobs:
 
       - name: Run checker
         env:
-          FRAMADATE_URL:      ${{ secrets.FRAMADATE_URL }}
-          PLAYER_NAME:        ${{ vars.PLAYER_NAME }}
+          FRAMADATE_URL: ${{ secrets.FRAMADATE_URL }}
+          PLAYER_NAME: ${{ vars.PLAYER_NAME }}
           MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
-          MAILGUN_DOMAIN:  ${{ secrets.MAILGUN_DOMAIN }}
-          MAILGUN_BASE_URL:  ${{ secrets.MAILGUN_BASE_URL }}
+          MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+          MAILGUN_BASE_URL: ${{ secrets.MAILGUN_BASE_URL }}
         run: python src/main.py --info
