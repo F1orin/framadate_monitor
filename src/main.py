@@ -22,6 +22,8 @@ def main():
                         help='Enable debug logging')
     parser.add_argument('--info', action='store_true',
                         help='Enable info logging')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Run checks but do not send email')
     args = parser.parse_args()
 
     if args.debug:
@@ -34,17 +36,24 @@ def main():
     log = logging.getLogger(__name__)
 
     log.info("Logging configured at %s", logging.getLevelName(log_level))
+    
+    if args.dry_run:
+        log.info("Dry run mode is enabled: real email won't be sent")
 
     log.debug('Loading environment variables')
     load_dotenv()
     try:
-        _validate_env([
+        required = [
             "FRAMADATE_URL",
             "PLAYER_NAME",
-            "MAILGUN_API_KEY",
-            "MAILGUN_DOMAIN",
-            "MAILGUN_BASE_URL"
-        ])
+        ]
+        if not args.dry_run:
+            required += [
+                "MAILGUN_API_KEY",
+                "MAILGUN_DOMAIN",
+                "MAILGUN_BASE_URL",
+            ]
+        _validate_env(required)
     except KeyError as e:
         log.error(str(e))
         sys.exit(1)
@@ -58,14 +67,22 @@ def main():
             framadate_url, player_name)
 
         if has_unmarked_days:
-            send_email(
-                subject="[Framadate monitor] New matches available",
-                body=f"{player_name} has unanswered matches in the Framadate: {framadate_url}"
-            )
-            log.info(f"Found unmartked days for '{player_name}', email sent")
+            subject = "[Framadate monitor] New matches available"
+            body = f"{player_name} has unanswered matches in the Framadate: {framadate_url}"
+
+            if args.dry_run:
+                log.info(
+                    f"DRY RUN: would send email: subject={subject} body={body}"
+                )
+            else:
+                send_email(subject=subject, body=body,)
+                log.info(
+                    f"Found unmartked days for '{player_name}', email sent"
+                )
         else:
             log.info(
-                f"All days are marked for '{player_name}', email not sent")
+                f"All days are marked for '{player_name}', email not sent"
+            )
     except PlayerNotFoundError as e:
         log.error(str(e))
         sys.exit(2)
