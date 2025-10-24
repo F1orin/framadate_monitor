@@ -4,7 +4,7 @@ A foot5 group I play with uses Framadate to schedule matches. Group organiser sc
 
 The app automatically checks for new unanswered events and sends email notifications when they're available.
 
-<img src="https://github.com/F1orin/framadate_monitor/blob/main/Screenshot.jpg" width="400" alt="Framadate interface">
+<img src="https://github.com/F1orin/framadate_monitor/blob/main/Screenshot.png" width="600" alt="Framadate interface">
 
 ## What it does
 
