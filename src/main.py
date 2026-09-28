@@ -53,6 +53,7 @@ def main():
                 "MAILGUN_API_KEY",
                 "MAILGUN_DOMAIN",
                 "MAILGUN_BASE_URL",
+                "NOTIFICATION_EMAIL",
             ]
         _validate_env(required)
     except KeyError as e:

@@ -28,6 +28,7 @@ jobs:
         env:
           FRAMADATE_URL: ${{ secrets.FRAMADATE_URL }}
           PLAYER_NAME: ${{ vars.PLAYER_NAME }}
+          NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
           MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
           MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
           MAILGUN_BASE_URL: ${{ secrets.MAILGUN_BASE_URL }}

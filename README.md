@@ -25,6 +25,7 @@ The app automatically checks for new unanswered events and sends email notificat
    ```
    FRAMADATE_URL='https://your-framadate-poll-url'
    PLAYER_NAME='Your Player Name'
+   NOTIFICATION_EMAIL='recipient@example.com'
    MAILGUN_API_KEY='your-mailgun-api-key'
    MAILGUN_DOMAIN='your-mailgun-domain'
    MAILGUN_BASE_URL='https://api.mailgun.net'
@@ -56,12 +57,15 @@ Available options:
 | `--info` | Show normal operational messages. |
 | `--debug` | Show detailed diagnostic messages; takes precedence over `--info`. |
 
-Options can be combined. Without `--dry-run`, the Mailgun variables are also
-required and an email is sent when unanswered dates are found.
+Options can be combined. Without `--dry-run`, `NOTIFICATION_EMAIL` and the
+Mailgun variables are also required, and an email is sent to that address when
+unanswered dates are found.
 
 The included GitHub Actions workflow runs automatically every day at 09:00 and
 18:00 UTC. It can also be started manually from
 **Actions → check-and-alert → Run workflow**.
+Configure `PLAYER_NAME` as a repository variable and the remaining values,
+including `NOTIFICATION_EMAIL`, as repository secrets.
 
 ## Requirements
 
