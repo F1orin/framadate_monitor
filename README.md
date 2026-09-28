@@ -32,16 +32,36 @@ The app automatically checks for new unanswered events and sends email notificat
 
 ## Usage
 
+Run locally after completing the setup:
+
 ```bash
-# Run the monitor
+# Run the monitor and send an email when needed
 python src/main.py
 
-# Dry run (no email sent)
-python src/main.py --dry-run
+# Check the poll without sending email
+python src/main.py --dry-run --info
 
-# Run with debug logging
+# Show detailed diagnostic logs
 python src/main.py --debug
+
+# List all options
+python src/main.py --help
 ```
+
+Available options:
+
+| Option | Description |
+| --- | --- |
+| `--dry-run` | Check the live poll without sending email. Only `FRAMADATE_URL` and `PLAYER_NAME` are required. |
+| `--info` | Show normal operational messages. |
+| `--debug` | Show detailed diagnostic messages; takes precedence over `--info`. |
+
+Options can be combined. Without `--dry-run`, the Mailgun variables are also
+required and an email is sent when unanswered dates are found.
+
+The included GitHub Actions workflow runs automatically every day at 09:00 and
+18:00 UTC. It can also be started manually from
+**Actions → check-and-alert → Run workflow**.
 
 ## Requirements
 

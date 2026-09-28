@@ -2,7 +2,7 @@ name: check-and-alert
 
 on:
   schedule:
-    - cron: "0 9 * * *" # every day at 9AM
+    - cron: "0 9,18 * * *" # every day at 9AM and 6PM UTC
   workflow_dispatch:
 
 jobs:
