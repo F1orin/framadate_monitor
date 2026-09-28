@@ -2,15 +2,27 @@
 
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+from urllib.parse import quote
 
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
+from src import scraper
 from src.scraper import PlayerNotFoundError, check_player_has_unmarked_days
 
 
 POLL_URL = (Path(__file__).parent / "fixtures" / "new_poll.html").resolve().as_uri()
+POLL_HTML = (Path(__file__).parent / "fixtures" / "new_poll.html").read_text()
+INVALID_VOTE_POLL_URL = "data:text/html;charset=utf-8," + quote(
+    POLL_HTML.replace(
+        '<span class="sr-only">No</span>',
+        '<span class="sr-only">Maybe</span>',
+        1,
+    )
+)
 
 
 class NewInterfaceStructureTests(unittest.TestCase):
@@ -95,6 +107,30 @@ class NewInterfaceScraperTests(unittest.TestCase):
     def test_missing_participant_raises_player_not_found(self):
         with self.assertRaises(PlayerNotFoundError):
             check_player_has_unmarked_days(POLL_URL, "Missing Player")
+
+    def test_timeout_raises_poll_interface_error(self):
+        with patch("src.scraper.WebDriverWait") as wait:
+            wait.return_value.until.side_effect = TimeoutException
+
+            with self.assertRaises(scraper.PollInterfaceError) as raised:
+                check_player_has_unmarked_days(POLL_URL, "Answered Player")
+
+        self.assertEqual(
+            str(raised.exception),
+            "Timed out waiting for the Framadate poll interface",
+        )
+
+    def test_unexpected_vote_label_raises_poll_interface_error(self):
+        with self.assertRaises(scraper.PollInterfaceError) as raised:
+            check_player_has_unmarked_days(
+                INVALID_VOTE_POLL_URL,
+                "Answered Player",
+            )
+
+        self.assertEqual(
+            str(raised.exception),
+            "Unexpected vote label in Framadate poll: 'Maybe'",
+        )
 
 
 if __name__ == "__main__":

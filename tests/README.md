@@ -21,8 +21,10 @@ Chrome and its Selenium driver are required; Selenium may download the driver
 on first use.
 
 Five structure checks describe the fields needed by the monitor and verify that
-the fixture contains no links, forms or external identifiers. Three regression
-tests call the scraper for answered, unanswered and missing participants. One
-notifier test verifies that the recipient comes from `NOTIFICATION_EMAIL`.
+the fixture contains no links, forms or external identifiers. Five scraper
+regression tests cover answered, unanswered and missing participants, timeouts,
+and unexpected vote labels. One command-line test verifies that interface
+failures exit without a traceback, and one notifier test verifies that the
+recipient comes from `NOTIFICATION_EMAIL`.
 Passing the local fixture checks alone does not prove compatibility with the live
 service; use a live dry run for an end-to-end check.

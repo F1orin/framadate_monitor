@@ -7,7 +7,11 @@ from dotenv import load_dotenv
 from requests import RequestException
 
 from notifier import send_email
-from scraper import check_player_has_unmarked_days, PlayerNotFoundError
+from scraper import (
+    PollInterfaceError,
+    PlayerNotFoundError,
+    check_player_has_unmarked_days,
+)
 
 
 def _validate_env(required_vars: list[str]):
@@ -92,6 +96,9 @@ def main():
     except PlayerNotFoundError as e:
         log.error(str(e))
         sys.exit(2)
+    except PollInterfaceError as e:
+        log.error(str(e))
+        sys.exit(4)
 
 
 if __name__ == "__main__":
