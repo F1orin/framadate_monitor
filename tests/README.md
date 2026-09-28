@@ -4,6 +4,8 @@ Run from the repository root with dependencies installed and Chrome available:
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
+The same test suite runs in GitHub Actions on every push and pull request.
+
 The fixture contains the minimal table structure required by the scraper, derived
 from the Framadate interface snapshot saved on 2026-09-28. It is safe to publish:
 real names, poll and vote identifiers, edit links, forms, comments, totals and

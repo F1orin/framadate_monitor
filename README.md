@@ -67,6 +67,8 @@ The included GitHub Actions workflow runs automatically every day at 09:00 and
 Configure `PLAYER_NAME` as a repository variable and the remaining values,
 including `NOTIFICATION_EMAIL`, as repository secrets.
 
+A separate test workflow runs the test suite on every push and pull request.
+
 ## Requirements
 
 - Python 3.11+
