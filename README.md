@@ -9,7 +9,7 @@ The app automatically checks for new unanswered events and sends email notificat
 ## What it does
 
 - Scrapes a Framadate poll using Selenium WebDriver
-- Checks if a specific player has any days marked as "I don't know" 
+- Checks whether a specific player has any unanswered dates
 - Sends email notifications via Mailgun when unmarked days are found
 - Supports dry-run mode for testing
 - Runs on GitHub Actions schedule (fits within free tier limits)

@@ -14,8 +14,7 @@ class Vote(StrEnum):
     """Represents possible responses/votes to a Framadate poll."""
     YES = "Yes"
     NO = "No"
-    UNDER_RESERVE = "Under reserve"
-    I_DONT_KNOW = "I don’t know"  # curly apostrophe on purpose
+    IF_NEEDED = "If needed"
 
 
 class PlayerNotFoundError(LookupError):
@@ -24,14 +23,10 @@ class PlayerNotFoundError(LookupError):
 
 def check_player_has_unmarked_days(framadate_url, player_name) -> bool:
     """
-    Checks the Framadate poll to determine if a player has any unmarked (i.e., "I don't know") days.
+    Check whether a player has any unanswered dates in a Framadate poll.
 
     Returns:
-        VoteStatus: See `VoteStatus` class documentation for descriptions of the returned values.
-
-    Reads environment variables:
-        FRAMADATE_URL: URL of the Framadate poll.
-        PLAYER_NAME: Name of the player to search for.
+        True when at least one answer cell is empty, otherwise False.
 
     Uses Selenium WebDriver to interact with the Framadate web interface and analyze poll results.
     """
@@ -46,18 +41,23 @@ def check_player_has_unmarked_days(framadate_url, player_name) -> bool:
         driver.get(framadate_url)
         wait = WebDriverWait(driver, 10)
 
-        table = wait.until(EC.presence_of_element_located((By.ID, "results2")))
+        table = wait.until(EC.presence_of_element_located(
+            (By.CSS_SELECTOR, "#poll table.proposals-table")
+        ))
         log.debug("Table found")
 
         rows = table.find_elements(By.CSS_SELECTOR, "tbody tr")
 
         target_row = None
-        for r in rows:
-            title = r.get_attribute("title")
-            log.debug(f"Title found: {title}")
+        for row in rows:
+            author = row.find_element(
+                By.CSS_SELECTOR,
+                "th[scope='row'] .proposals-table__author",
+            ).text.strip()
+            log.debug("Player found: %s", author)
 
-            if title == player_name:
-                target_row = r
+            if author == player_name:
+                target_row = row
                 break
 
         if not target_row:
@@ -65,12 +65,15 @@ def check_player_has_unmarked_days(framadate_url, player_name) -> bool:
                 f"Player '{player_name}' not found")
 
         cells = target_row.find_elements(By.CSS_SELECTOR, "td")
-        for c in cells:
-            span = c.find_element(By.CSS_SELECTOR, "span.sr-only")
-            value = span.get_attribute("textContent")
-            log.debug(f"Answer found: {value}")
-
-            if value == Vote.I_DONT_KNOW:
+        for cell in cells:
+            votes = cell.find_elements(By.CSS_SELECTOR, ".vote")
+            if not votes:
+                log.debug("Unanswered date found")
                 return True
+
+            value = votes[0].find_element(
+                By.CSS_SELECTOR, ".sr-only"
+            ).get_attribute("textContent").strip()
+            log.debug("Answer found: %s", Vote(value))
 
     return False
