@@ -69,6 +69,6 @@ including `NOTIFICATION_EMAIL`, as repository secrets.
 
 ## Requirements
 
-- Python 3.13+
+- Python 3.11+
 - Chrome browser (for Selenium WebDriver)
 - Mailgun account for email notifications
